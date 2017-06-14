@@ -21,6 +21,8 @@ inf_Traceback = True
 
 class Rules:
     def checkPossibleMove(self, upper, lower):
+        '''Checks if is possible to exchange basket from tower with basket from ground,
+         e.g. weigth is between 0 and Safe constant'''
         assert (len(upper) > 0 or len(lower) > 0)
         upperWeight = self.calculateWeight(upper)
         lowerWeight = self.calculateWeight(lower)
@@ -31,6 +33,7 @@ class Rules:
         return False
 
     def calculateWeight(self, tup):
+        '''Sum of the given basket(list with max two items)'''
         assert 0 <= len(tup) <= 2
         weight = 0
         for i in tup:
@@ -72,12 +75,15 @@ class State:
         self.__g = l
 
     def getF(self):
+        '''Returns value of heuristic function f(i).
+        f(i) = h(i) + g(i)'''
         h = 0
         for i in self.__tower:
             h += (i/10)
         return self.__g + h
 
     def expandState(self):
+        '''Calculate all possible states from current and return list of them'''
             expanded = []
             currentCopy = copy.deepcopy(self)
             t = self.getTuples(currentCopy.getTower())
@@ -110,15 +116,18 @@ class State:
                             print('After: Level: ', currentCopyToExpand.getLevel(), ' - ', currentCopyToExpand.getTower() , '---', currentCopyToExpand.getGround())
             return expanded
 
-    def getTuples(self, list):
+    def getTuples(self, l):
+        '''Return list of two-item (tuple) combinations of elements from given list L in ,
+        and also adds combination of elements with zero element, f.e. [1,2] -> [[0,1],[1,2],[2,0]].
+        Used for putting combinations of elements from ground or tower into basket.'''
         tuples = []
-        if len(list) == 0:
+        if len(l) == 0:
             return [[0, 0]]
-        for i in range(0, len(list)):
-            tuples.append([0, list[i]])
-        for i in range(0, len(list)):
-            for x in range(i + 1, len(list)):
-                tuples.append([list[i], list[x]])
+        for i in range(0, len(l)):
+            tuples.append([0, l[i]])
+        for i in range(0, len(l)):
+            for x in range(i + 1, len(l)):
+                tuples.append([l[i], l[x]])
         return tuples
 # ----------
 
@@ -133,13 +142,15 @@ class Game:
         self.openStates.append(self.initial)
 
     def checkFinalState(self, state):
-        self.times += 1
+        '''Checks if given state is wanted as final state.'''
+        self.times += 1  # just for getting info about how many states are explored with individual algorithms
         x = state.getGround()
         if King in x and Queen in x and Prince in x and Chest in x and len(state.getTower()) == 0:
             return True
         return False
 
     def parseWeight(self, lis):
+        '''Return list of strings of constant names'''
         r = []
         for l in lis:
             if l == King: r.append('King')
@@ -149,6 +160,8 @@ class Game:
         return r
 
     def victory(self, state):
+        '''Print info about successfully found state,
+        with inf_Traceback = True also prints of shortest path from initial to final state.'''
         print('\nFinal state found at level:', state.getLevel())
         print("Expanded: ", self.times)
         if inf_Traceback:
@@ -168,6 +181,7 @@ class Game:
             print('Tower: ', self.parseWeight(s.getTower()))
 
     def checkStateInList(self, what, where):
+        '''Checks if given state what is present in list of states where.'''
         if len(where) == 0:
             return False
         tower = what.getTower()
@@ -186,6 +200,7 @@ class Game:
         return True
 
     def searchWidth(self):
+        '''Implementation of state-space searching using Width-first search.'''
         print('Starting Breadth-first search')
         self.openStates.append(self.initial)
         if self.checkFinalState(self.initial):
@@ -207,6 +222,7 @@ class Game:
         print('Solution Does not exist')
 
     def searchDepth(self):
+        '''Implementation of state-space searching using Depth-first search.'''
         print('Starting Depth-first search')
         self.openStates.append(self.initial)
         if self.checkFinalState(self.initial):
@@ -228,6 +244,7 @@ class Game:
         print('Solution Does not exist')
 
     def searchInformed(self):
+        '''Implementation of state-space searching using A* algorithm search.'''
         print('Starting search with A')
         self.openStates.append(self.initial)
         if Game.checkFinalState(self, self.initial):
@@ -274,7 +291,7 @@ if __name__ == '__main__':
     print('Which algorithm:')
     print('D: Blind Depth Search')
     print('W: Blind Width Search')
-    print('I: Informed Search')
+    print('I: A* Informed Search')
     d = input('Input: ')
     if d not in ['W', 'D', 'I', 'w', 'd', 'i']:
         print('Unknown algorithm, aborting.')
