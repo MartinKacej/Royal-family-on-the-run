@@ -84,37 +84,38 @@ class State:
 
     def expandState(self):
         '''Calculate all possible states from current and return list of them'''
-            expanded = []
-            currentCopy = copy.deepcopy(self)
-            t = self.getTuples(currentCopy.getTower())
-            g = self.getTuples(currentCopy.getGround())
-            g.append([0, 0])  # Dirty hack
-            for it in t[:]:
-                for ig in g[:]:
-                    if self.__rules.checkPossibleMove(it, ig):
-                        if inf_State: print('-----------------')
-                        if inf_State: print('Prev:', currentCopy.getTower(), '---', currentCopy.getGround())
-                        currentCopyToExpand = copy.deepcopy(currentCopy)
-                        if 0 in ig: ig.remove(0)
-                        if 0 in it: it.remove(0)
-                        if 0 in ig: ig.remove(0)
-                        if 0 in it: it.remove(0)
-                        if self.__rules.calculateWeight(it) == Chest:
-                            currentCopyToExpand.__ground.append(it[0])
-                            currentCopyToExpand.__tower.remove(it[0])
-                        else:
-                            for i in ig:
-                                currentCopyToExpand.__tower.append(i)
-                                currentCopyToExpand.__ground.remove(i)
-                            for i in it:
-                                currentCopyToExpand.__tower.remove(i)
-                                currentCopyToExpand.__ground.append(i)
-                        currentCopyToExpand.increaseLevel()
-                        currentCopyToExpand.__prevNode = self
-                        expanded.append(currentCopyToExpand)
-                        if inf_State:
-                            print('After: Level: ', currentCopyToExpand.getLevel(), ' - ', currentCopyToExpand.getTower() , '---', currentCopyToExpand.getGround())
-            return expanded
+        expanded = []
+        currentCopy = copy.deepcopy(self)
+        t = self.getTuples(currentCopy.getTower())
+        g = self.getTuples(currentCopy.getGround())
+        g.append([0, 0])  # Dirty hack
+        for it in t[:]:
+            for ig in g[:]:
+                if self.__rules.checkPossibleMove(it, ig):
+                    if inf_State: print('-----------------')
+                    if inf_State: print('Prev:', currentCopy.getTower(), '---', currentCopy.getGround())
+                    currentCopyToExpand = copy.deepcopy(currentCopy)
+                    if 0 in ig: ig.remove(0)
+                    if 0 in it: it.remove(0)
+                    if 0 in ig: ig.remove(0)
+                    if 0 in it: it.remove(0)
+                    if self.__rules.calculateWeight(it) == Chest:
+                        currentCopyToExpand.__ground.append(it[0])
+                        currentCopyToExpand.__tower.remove(it[0])
+                    else:
+                        for i in ig:
+                            currentCopyToExpand.__tower.append(i)
+                            currentCopyToExpand.__ground.remove(i)
+                        for i in it:
+                            currentCopyToExpand.__tower.remove(i)
+                            currentCopyToExpand.__ground.append(i)
+                    currentCopyToExpand.increaseLevel()
+                    currentCopyToExpand.__prevNode = self
+                    expanded.append(currentCopyToExpand)
+                    if inf_State:
+                        print('After: Level: ', currentCopyToExpand.getLevel(), ' - ', currentCopyToExpand.getTower(),
+                              '---', currentCopyToExpand.getGround())
+        return expanded
 
     def getTuples(self, l):
         '''Return list of two-item (tuple) combinations of elements from given list L in ,
